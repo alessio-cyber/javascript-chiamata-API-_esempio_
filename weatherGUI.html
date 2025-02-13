@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1bafb7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .weather-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .weather-info {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="weather-container">
+    <h2>Weather App</h2>
+    <input type="text" id="city-input" placeholder="Enter a city">
+    <button onclick="getWeather()">Get Weather</button>
+    
+    <div id="weather-info" class="weather-info"></div>
+</div>
+
+<script>
+    const API_Key = ''; //inserire la propria apikey
+
+    async function getWeather() {
+        const city = document.getElementById('city-input').value;
+        const baseUrl = `https://api.openweathermap.org/data/2.5/weather?APPID=${API_Key}&q=${city}&units=metric`;
+
+        try {
+            const response = await fetch(baseUrl);
+            const data = await response.json();
+
+            if (data.cod !== 200) {
+                throw new Error(data.message);
+            }
+
+            const citta = data.name;
+            const paese = data.sys.country;
+            const coord = `Lat: ${data.coord.lat}, Lon: ${data.coord.lon}, Alt: ${data.main.grnd_level || 'N/A'}m s.l.m.`;
+            const solare = `Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}, Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}`;
+            const visibilita = data.visibility || 'N/A';
+            const cielo = data.weather[0].description;
+            const vento = `Direction: ${data.wind.deg || 'N/A'}°, Velocity: ${data.wind.speed || 'N/A'} m/s`;
+            const temperatura = `Current: ${data.main.temp}°C, Min: ${data.main.temp_min}°C, Max: ${data.main.temp_max}°C, Humidity: ${data.main.humidity}%`;
+
+            document.getElementById('weather-info').innerHTML = `
+                <strong>General info for ${citta}, ${paese}:</strong><br>
+                <strong>Coordinates:</strong> ${coord}<br>
+                <strong>Weather:</strong> ${cielo}<br>
+                <strong>Solar info:</strong> ${solare}<br>
+                <strong>Visibility:</strong> ${visibilita} m<br>
+                <strong>Temperature info:</strong> ${temperatura}<br>
+                <strong>Wind status:</strong> ${vento}
+            `;
+        } catch (error) {
+            document.getElementById('weather-info').innerHTML = `<strong>Error:</strong> ${error.message}`;
+        }
+    }
+</script>
+
+</body>
+</html>
